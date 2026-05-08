@@ -20,8 +20,16 @@ var newCmd = &cobra.Command{
 	Use:   "new",
 	Short: "Generate a project from a template",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		input := prompt.NewProjectFromInputFlags(newLang, newFramework, newProjectType, newArch, newName)
+		input := prompt.NewProjectInputFromFlags(newLang, newFramework, newProjectType, newArch, newName)
 		cat := catalog.NewCatalog()
+
+		if input.Language == "" {
+			promptInput, err := prompt.AskNewProjectInput(cat)
+			if err != nil {
+				return err
+			}
+			input.Language = promptInput.Language
+		}
 
 		err := validateProjectInput(cat, input)
 		if err != nil {
@@ -29,6 +37,11 @@ var newCmd = &cobra.Command{
 		}
 
 		fmt.Println("project configuration is valid")
+		fmt.Println(" language:     ", input.Language)
+		fmt.Println(" framework:    ", input.Framework)
+		fmt.Println(" type:         ", input.ProjectType)
+		fmt.Println(" architecture: ", input.Architecture)
+		fmt.Println(" name:         ", input.Name)
 		return nil
 	},
 }
@@ -60,11 +73,5 @@ func validateProjectInput(cat catalog.Catalog, input prompt.NewProjectInput) err
 		return fmt.Errorf("unsupported stack")
 	}
 
-	fmt.Println("project configuration is valid")
-	fmt.Println(" language:     ", input.Language)
-	fmt.Println(" framework:    ", input.Framework)
-	fmt.Println(" type:         ", input.ProjectType)
-	fmt.Println(" architecture: ", input.Architecture)
-	fmt.Println(" name:         ", input.Name)
 	return nil
 }

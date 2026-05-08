@@ -10,7 +10,7 @@ type NewProjectInput struct {
 	Name         string
 }
 
-func NewProjectFromInputFlags(lang string, framework string, projectType string, arch string, name string) NewProjectInput {
+func NewProjectInputFromFlags(lang string, framework string, projectType string, arch string, name string) NewProjectInput {
 	return NewProjectInput{
 		Language:     catalog.Language(lang),
 		Framework:    catalog.Framework(framework),
