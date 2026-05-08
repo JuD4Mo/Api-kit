@@ -2,8 +2,10 @@ package cli
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/Jud4Mo/multi-templates/internal/catalog"
+	"github.com/Jud4Mo/multi-templates/internal/generator"
 	"github.com/Jud4Mo/multi-templates/internal/prompt"
 	"github.com/spf13/cobra"
 )
@@ -23,15 +25,30 @@ var newCmd = &cobra.Command{
 		input := prompt.NewProjectInputFromFlags(newLang, newFramework, newProjectType, newArch, newName)
 		cat := catalog.NewCatalog()
 
-		if input.Language == "" {
-			promptInput, err := prompt.AskNewProjectInput(cat)
-			if err != nil {
-				return err
-			}
-			input.Language = promptInput.Language
+		err := validateProvidedProjectInputByFlags(cat, input)
+		if err != nil {
+			return err
 		}
 
-		err := validateProjectInput(cat, input)
+		input, err = prompt.AskNewProjectInput(cat, input)
+		if err != nil {
+			return err
+		}
+
+		err = validateProjectInput(cat, input)
+		if err != nil {
+			return err
+		}
+
+		projectConfig := generator.ProjectConfig{
+			Language:     input.Language,
+			Framework:    input.Framework,
+			ProjectType:  input.ProjectType,
+			Architecture: input.Architecture,
+			Name:         input.Name,
+		}
+
+		err = generator.Generate(projectConfig)
 		if err != nil {
 			return err
 		}
@@ -71,6 +88,38 @@ func validateProjectInput(cat catalog.Catalog, input prompt.NewProjectInput) err
 
 	if !cat.IsSupported(stack) {
 		return fmt.Errorf("unsupported stack")
+	}
+
+	return nil
+}
+
+func validateProvidedProjectInputByFlags(cat catalog.Catalog, input prompt.NewProjectInput) error {
+	if input.Language != "" {
+		languages := cat.Languages()
+		if !slices.Contains(languages, input.Language) {
+			return fmt.Errorf("language not supported")
+		}
+	}
+
+	if input.Framework != "" && input.Language != "" {
+		frameworks := cat.FrameworksByLanguage(input.Language)
+		if !slices.Contains(frameworks, input.Framework) {
+			return fmt.Errorf("framework not supported")
+		}
+	}
+
+	if input.Language != "" && input.Framework != "" && input.ProjectType != "" {
+		types := cat.ProjectTypesByLanguageAndFramework(input.Language, input.Framework)
+		if !slices.Contains(types, input.ProjectType) {
+			return fmt.Errorf("project system architecture not supported")
+		}
+	}
+
+	if input.Architecture != "" && input.Language != "" && input.Framework != "" && input.ProjectType != "" {
+		archs := cat.ArchitecturesByBase(input.Language, input.Framework, input.ProjectType)
+		if !slices.Contains(archs, input.Architecture) {
+			return fmt.Errorf("code architecture not supported")
+		}
 	}
 
 	return nil

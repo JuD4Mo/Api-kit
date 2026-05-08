@@ -22,22 +22,104 @@ func optionsFromValues[T ~string](values []T) []huh.Option[T] {
 	return options
 }
 
-func AskNewProjectInput(cat catalog.Catalog) (NewProjectInput, error) {
-	newProjectInput := NewProjectInput{}
-	langOptions := optionsFromValues(cat.Languages())
-	selectHuh := huh.NewSelect[catalog.Language]().
-		Title("Which language do you want to use?").
-		Options(langOptions...).
-		Value(&newProjectInput.Language)
+func AskNewProjectInput(cat catalog.Catalog, input NewProjectInput) (NewProjectInput, error) {
+	if input.Language == "" {
+		langOptions := optionsFromValues(cat.Languages())
+		selectLanguageHuh := huh.NewSelect[catalog.Language]().
+			Title("Which language do you want to use?").
+			Options(langOptions...).
+			Value(&input.Language)
 
-	err := huh.NewForm(
-		huh.NewGroup(
-			selectHuh,
-		),
-	).Run()
-	if err != nil {
-		return newProjectInput, fmt.Errorf("run new project prompt: %w", err)
+		err := huh.NewForm(
+			huh.NewGroup(
+				selectLanguageHuh,
+			),
+		).Run()
+		if err != nil {
+			return input, fmt.Errorf("run new project prompt: %w", err)
+		}
 	}
 
-	return newProjectInput, nil
+	if input.Framework == "" {
+		frameworkOptions := optionsFromValues(
+			cat.FrameworksByLanguage(input.Language),
+		)
+
+		selectFrameworkHuh := huh.NewSelect[catalog.Framework]().
+			Title("Which framework do you want to use?").
+			Options(frameworkOptions...).
+			Value(&input.Framework)
+
+		err := huh.NewForm(
+			huh.NewGroup(
+				selectFrameworkHuh,
+			),
+		).Run()
+		if err != nil {
+			return input, fmt.Errorf("run new project prompt: %w", err)
+		}
+	}
+
+	if input.ProjectType == "" {
+		typesOptions := optionsFromValues(
+			cat.ProjectTypesByLanguageAndFramework(input.Language, input.Framework),
+		)
+		selectProjectTypeHuh := huh.NewSelect[catalog.ProjectType]().
+			Title("Which system architecture do you want to implement?").
+			Options(typesOptions...).
+			Value(&input.ProjectType)
+
+		err := huh.NewForm(
+			huh.NewGroup(
+				selectProjectTypeHuh,
+			),
+		).Run()
+		if err != nil {
+			return input, fmt.Errorf("run new project prompt: %w", err)
+		}
+	}
+
+	if input.Architecture == "" {
+		archsOptions := optionsFromValues(
+			cat.ArchitecturesByBase(input.Language, input.Framework, input.ProjectType),
+		)
+		selectArchOptions := huh.NewSelect[catalog.Architecture]().
+			Title("Which code architecture do you want to use?").
+			Options(archsOptions...).
+			Value(&input.Architecture)
+
+		err := huh.NewForm(
+			huh.NewGroup(
+				selectArchOptions,
+			),
+		).Run()
+		if err != nil {
+			return input, fmt.Errorf("run new project prompt: %w", err)
+		}
+	}
+
+	if input.Name == "" {
+		projectName := huh.NewInput().
+			Title("What is the project name?").
+			Value(&input.Name).
+			Validate(validateName)
+
+		err := huh.NewForm(
+			huh.NewGroup(
+				projectName,
+			),
+		).Run()
+		if err != nil {
+			return input, fmt.Errorf("run new project prompt: %w", err)
+		}
+	}
+
+	return input, nil
+}
+
+func validateName(projectName string) error {
+	if projectName == "" {
+		return fmt.Errorf("name can not be empty")
+	}
+	return nil
 }
