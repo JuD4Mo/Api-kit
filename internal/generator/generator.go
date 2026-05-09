@@ -42,9 +42,9 @@ func Generate(config ProjectConfig) error {
 
 	paths := []string{
 		"cmd/api",
-		"internal/controller",
-		"internal/repository",
-		"internal/service",
+		"internal/item",
+		"internal/domain",
+		"pkg/bootstrap",
 	}
 
 	for _, relativePath := range paths {
@@ -62,6 +62,41 @@ func Generate(config ProjectConfig) error {
 		return err
 	}
 
+	bootstrapPath := filepath.Join("pkg", "bootstrap", "bootstrap.go")
+	content = bootstrapContent()
+	err = writeProjectFile(config.Name, bootstrapPath, content)
+	if err != nil {
+		return err
+	}
+
+	itemPath := filepath.Join("internal", "domain", "item.go")
+	content = itemContent()
+	err = writeProjectFile(config.Name, itemPath, content)
+	if err != nil {
+		return err
+	}
+
+	repositoryPath := filepath.Join("internal", "item", "repository.go")
+	content = repositoryContent()
+	err = writeProjectFile(config.Name, repositoryPath, content)
+	if err != nil {
+		return err
+	}
+
+	servicePath := filepath.Join("internal", "item", "service.go")
+	content = serviceContent()
+	err = writeProjectFile(config.Name, servicePath, content)
+	if err != nil {
+		return err
+	}
+
+	controllerPath := filepath.Join("internal", "item", "controller.go")
+	content = controllerContent()
+	err = writeProjectFile(config.Name, controllerPath, content)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -75,7 +110,15 @@ func writeProjectFile(projectName string, relativePath string, content string) e
 }
 
 func readmeContent(projectName string) string {
-	return fmt.Sprintf("# %s\n", projectName)
+	return fmt.Sprintf(`
+# %s
+
+## Executes this following commands
+go mod tidy
+
+## Start web server
+go run ./cmd/api
+`, projectName)
 }
 
 func goModContent(projectName string) string {
@@ -84,11 +127,41 @@ func goModContent(projectName string) string {
 
 func mainGoContent() string {
 	return `package main
-	
+
 import "fmt"
 
 func main() {
 	fmt.Println("working")
 }
+`
+}
+
+func bootstrapContent() string {
+	return `
+	
+`
+}
+
+func itemContent() string {
+	return `
+	
+`
+}
+
+func repositoryContent() string {
+	return `
+	
+`
+}
+
+func serviceContent() string {
+	return `
+	
+`
+}
+
+func controllerContent() string {
+	return `
+	
 `
 }

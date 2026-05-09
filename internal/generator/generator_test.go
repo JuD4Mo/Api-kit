@@ -1,0 +1,71 @@
+package generator
+
+import (
+	"os"
+	"path/filepath"
+	"testing"
+
+	"github.com/Jud4Mo/multi-templates/internal/catalog"
+)
+
+func TestGenerate(t *testing.T) {
+	// temporal directory
+	tmp := t.TempDir()
+	completePath := filepath.Join(tmp, "something")
+
+	config := ProjectConfig{
+		Language:     catalog.LanguageGo,
+		Framework:    catalog.FrameworkGin,
+		ProjectType:  catalog.ProjectTypeMonolith,
+		Architecture: catalog.ArchitectureLayered,
+		Name:         completePath,
+	}
+
+	err := Generate(config)
+	if err != nil {
+		t.Fatalf("failed: %v", err)
+	}
+
+	readme := filepath.Join(completePath, "README.md")
+	gomod := filepath.Join(completePath, "go.mod")
+	maingo := filepath.Join(completePath, "cmd", "api", "main.go")
+	item := filepath.Join(completePath, "internal", "domain", "item.go")
+	controller := filepath.Join(completePath, "internal", "item", "controller.go")
+	repo := filepath.Join(completePath, "internal", "item", "repository.go")
+	service := filepath.Join(completePath, "internal", "item", "service.go")
+	boots := filepath.Join(completePath, "pkg", "bootstrap", "bootstrap.go")
+
+	assertPathExists(t, readme)
+	assertPathExists(t, gomod)
+	assertPathExists(t, maingo)
+	assertPathExists(t, item)
+	assertPathExists(t, controller)
+	assertPathExists(t, repo)
+	assertPathExists(t, service)
+	assertPathExists(t, boots)
+
+}
+
+func TestGenerateError(t *testing.T) {
+	config := ProjectConfig{
+		Language:     catalog.LanguageGo,
+		Framework:    catalog.FrameworkGin,
+		ProjectType:  catalog.ProjectTypeMonolith,
+		Architecture: catalog.ArchitectureLayered,
+		Name:         "",
+	}
+
+	err := Generate(config)
+	if err == nil {
+		t.Fatal("Generate() error = nil, want error")
+	}
+
+}
+
+func assertPathExists(t *testing.T, path string) {
+	t.Helper()
+	_, err := os.Stat(path)
+	if err != nil {
+		t.Fatalf("failed finding path: %v", err)
+	}
+}
