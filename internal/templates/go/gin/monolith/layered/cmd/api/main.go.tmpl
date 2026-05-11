@@ -1,0 +1,25 @@
+package main
+
+import (
+	"net/http"
+	"{{.Module}}/pkg/bootstrap"
+	"github.com/gin-gonic/gin"
+)
+
+func main() {
+	logger := bootstrap.InitLogger()
+
+	r := gin.Default()
+
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "alive :D",
+		})
+	})
+
+	logger.Println("server listening on port :8080")
+  
+	if err := r.Run(":8080"); err != nil {
+		logger.Fatal(err)
+	}
+}

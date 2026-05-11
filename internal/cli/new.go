@@ -46,6 +46,7 @@ var newCmd = &cobra.Command{
 			ProjectType:  input.ProjectType,
 			Architecture: input.Architecture,
 			Name:         input.Name,
+			Module:       input.Name,
 		}
 
 		err = generator.Generate(projectConfig)

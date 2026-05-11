@@ -1,11 +1,14 @@
 package generator
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
+	"text/template"
 
 	"github.com/Jud4Mo/multi-templates/internal/catalog"
+	"github.com/Jud4Mo/multi-templates/internal/templates"
 )
 
 type ProjectConfig struct {
@@ -14,11 +17,20 @@ type ProjectConfig struct {
 	ProjectType  catalog.ProjectType
 	Architecture catalog.Architecture
 	Name         string
+	Module       string
+}
+
+type templateData struct {
+	ProjectName string
+	Module      string
 }
 
 func Generate(config ProjectConfig) error {
 	if config.Name == "" {
 		return fmt.Errorf("project name can not be empty")
+	}
+	if config.Module == "" {
+		config.Module = config.Name
 	}
 
 	err := os.Mkdir(config.Name, 0755)
@@ -26,20 +38,36 @@ func Generate(config ProjectConfig) error {
 		return fmt.Errorf("create project directory: %w", err)
 	}
 
+	data := templateData{
+		ProjectName: config.Name,
+		Module:      config.Module,
+	}
+
+	//Render README.md file
 	readmePath := "README.md"
-	content := readmeContent(config.Name)
+	content, err := renderTemplate("go/gin/monolith/layered/README.md.tmpl", data)
+	if err != nil {
+		return err
+	}
+
 	err = writeProjectFile(config.Name, readmePath, content)
 	if err != nil {
 		return err
 	}
 
+	//Render go.mod file
 	modulePath := "go.mod"
-	content = goModContent(config.Name)
+	content, err = renderTemplate("go/gin/monolith/layered/go.mod.tmpl", data)
+	if err != nil {
+		return err
+	}
+
 	err = writeProjectFile(config.Name, modulePath, content)
 	if err != nil {
 		return err
 	}
 
+	//Define project paths
 	paths := []string{
 		"cmd/api",
 		"internal/item",
@@ -55,43 +83,73 @@ func Generate(config ProjectConfig) error {
 		}
 	}
 
+	//Render main.go file
 	mainPath := filepath.Join("cmd", "api", "main.go")
-	content = mainGoContent()
+	content, err = renderTemplate("go/gin/monolith/layered/cmd/api/main.go.tmpl", data)
+	if err != nil {
+		return err
+	}
+
 	err = writeProjectFile(config.Name, mainPath, content)
 	if err != nil {
 		return err
 	}
 
+	//Render bootstrap.go file
 	bootstrapPath := filepath.Join("pkg", "bootstrap", "bootstrap.go")
-	content = bootstrapContent()
+	content, err = renderTemplate("go/gin/monolith/layered/pkg/bootstrap/bootstrap.go.tmpl", data)
+	if err != nil {
+		return err
+	}
+
 	err = writeProjectFile(config.Name, bootstrapPath, content)
 	if err != nil {
 		return err
 	}
 
+	//Render item.go file (domain)
 	itemPath := filepath.Join("internal", "domain", "item.go")
-	content = itemContent()
+	content, err = renderTemplate("go/gin/monolith/layered/internal/domain/item.go.tmpl", data)
+	if err != nil {
+		return err
+	}
+
 	err = writeProjectFile(config.Name, itemPath, content)
 	if err != nil {
 		return err
 	}
 
+	//Render repository.go file
 	repositoryPath := filepath.Join("internal", "item", "repository.go")
-	content = repositoryContent()
+	content, err = renderTemplate("go/gin/monolith/layered/internal/item/repository.go.tmpl", data)
+	if err != nil {
+		return err
+	}
+
 	err = writeProjectFile(config.Name, repositoryPath, content)
 	if err != nil {
 		return err
 	}
 
+	//Render service.go file
 	servicePath := filepath.Join("internal", "item", "service.go")
-	content = serviceContent()
+	content, err = renderTemplate("go/gin/monolith/layered/internal/item/service.go.tmpl", data)
+	if err != nil {
+		return err
+	}
+
 	err = writeProjectFile(config.Name, servicePath, content)
 	if err != nil {
 		return err
 	}
 
+	//Render controller.go file
 	controllerPath := filepath.Join("internal", "item", "controller.go")
-	content = controllerContent()
+	content, err = renderTemplate("go/gin/monolith/layered/internal/item/controller.go.tmpl", data)
+	if err != nil {
+		return err
+	}
+
 	err = writeProjectFile(config.Name, controllerPath, content)
 	if err != nil {
 		return err
@@ -109,59 +167,23 @@ func writeProjectFile(projectName string, relativePath string, content string) e
 	return nil
 }
 
-func readmeContent(projectName string) string {
-	return fmt.Sprintf(`
-# %s
+func renderTemplate(path string, data templateData) (string, error) {
+	content, err := templates.FS.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("read template %s: %w", path, err)
+	}
 
-## Executes this following commands
-go mod tidy
+	tmpl, err := template.New(filepath.Base(path)).Parse(string(content))
+	if err != nil {
+		return "", fmt.Errorf("parse template %s: %w", path, err)
+	}
 
-## Start web server
-go run ./cmd/api
-`, projectName)
-}
+	var rendered bytes.Buffer
 
-func goModContent(projectName string) string {
-	return fmt.Sprintf("module %s\n\ngo 1.22\n", projectName)
-}
+	err = tmpl.Execute(&rendered, data)
+	if err != nil {
+		return "", fmt.Errorf("render template %s: %w", path, err)
+	}
 
-func mainGoContent() string {
-	return `package main
-
-import "fmt"
-
-func main() {
-	fmt.Println("working")
-}
-`
-}
-
-func bootstrapContent() string {
-	return `
-	
-`
-}
-
-func itemContent() string {
-	return `
-	
-`
-}
-
-func repositoryContent() string {
-	return `
-	
-`
-}
-
-func serviceContent() string {
-	return `
-	
-`
-}
-
-func controllerContent() string {
-	return `
-	
-`
+	return rendered.String(), nil
 }

@@ -19,6 +19,7 @@ func TestGenerate(t *testing.T) {
 		ProjectType:  catalog.ProjectTypeMonolith,
 		Architecture: catalog.ArchitectureLayered,
 		Name:         completePath,
+		Module:       "something",
 	}
 
 	err := Generate(config)
