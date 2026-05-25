@@ -3,8 +3,11 @@ package generator
 import (
 	"bytes"
 	"fmt"
+	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/Jud4Mo/multi-templates/internal/catalog"
@@ -43,127 +46,48 @@ func Generate(config ProjectConfig) error {
 		Module:      config.Module,
 	}
 
-	//Render README.md file
-	readmePath := "README.md"
-	content, err := renderTemplate("go/gin/monolith/layered/README.md.tmpl", data)
-	if err != nil {
-		return err
-	}
+	basePath := filepath.Join(
+		string(config.Language),
+		string(config.Framework),
+		string(config.ProjectType),
+		string(config.Architecture),
+	)
 
-	err = writeProjectFile(config.Name, readmePath, content)
-	if err != nil {
-		return err
-	}
-
-	//Render go.mod file
-	modulePath := "go.mod"
-	content, err = renderTemplate("go/gin/monolith/layered/go.mod.tmpl", data)
-	if err != nil {
-		return err
-	}
-
-	err = writeProjectFile(config.Name, modulePath, content)
-	if err != nil {
-		return err
-	}
-
-	//Define project paths
-	paths := []string{
-		"cmd/api",
-		"internal/item",
-		"internal/domain",
-		"pkg/bootstrap",
-	}
-
-	for _, relativePath := range paths {
-		completePath := filepath.Join(config.Name, relativePath)
-		err := os.MkdirAll(completePath, 0755)
+	// We use WalkDir in order to create folders and files
+	err = fs.WalkDir(templates.FS, basePath, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			return fmt.Errorf("generating structure error: %w", err)
+			return err
 		}
-	}
 
-	//Render main.go file
-	mainPath := filepath.Join("cmd", "api", "main.go")
-	content, err = renderTemplate("go/gin/monolith/layered/cmd/api/main.go.tmpl", data)
-	if err != nil {
-		return err
-	}
+		// we need the relative path to the created project
+		relativePath, err := filepath.Rel(basePath, path)
+		if err != nil {
+			return err
+		}
 
-	err = writeProjectFile(config.Name, mainPath, content)
-	if err != nil {
-		return err
-	}
+		// root directory will be returned as .
+		if relativePath == "." {
+			return nil
+		}
 
-	//Render bootstrap.go file
-	bootstrapPath := filepath.Join("pkg", "bootstrap", "bootstrap.go")
-	content, err = renderTemplate("go/gin/monolith/layered/pkg/bootstrap/bootstrap.go.tmpl", data)
-	if err != nil {
-		return err
-	}
+		outPath := filepath.Join(config.Name, relativePath)
 
-	err = writeProjectFile(config.Name, bootstrapPath, content)
-	if err != nil {
-		return err
-	}
+		if d.IsDir() {
+			return os.Mkdir(outPath, 0755)
+		}
 
-	//Render item.go file (domain)
-	itemPath := filepath.Join("internal", "domain", "item.go")
-	content, err = renderTemplate("go/gin/monolith/layered/internal/domain/item.go.tmpl", data)
-	if err != nil {
-		return err
-	}
+		if before, ok := strings.CutSuffix(outPath, ".tmpl"); ok {
+			content, err := renderTemplate(path, data)
+			if err != nil {
+				return err
+			}
+			log.Println(before)
+			return os.WriteFile(before, []byte(content), 0644)
+		}
 
-	err = writeProjectFile(config.Name, itemPath, content)
-	if err != nil {
-		return err
-	}
+		return nil
+	})
 
-	//Render repository.go file
-	repositoryPath := filepath.Join("internal", "item", "repository.go")
-	content, err = renderTemplate("go/gin/monolith/layered/internal/item/repository.go.tmpl", data)
-	if err != nil {
-		return err
-	}
-
-	err = writeProjectFile(config.Name, repositoryPath, content)
-	if err != nil {
-		return err
-	}
-
-	//Render service.go file
-	servicePath := filepath.Join("internal", "item", "service.go")
-	content, err = renderTemplate("go/gin/monolith/layered/internal/item/service.go.tmpl", data)
-	if err != nil {
-		return err
-	}
-
-	err = writeProjectFile(config.Name, servicePath, content)
-	if err != nil {
-		return err
-	}
-
-	//Render controller.go file
-	controllerPath := filepath.Join("internal", "item", "controller.go")
-	content, err = renderTemplate("go/gin/monolith/layered/internal/item/controller.go.tmpl", data)
-	if err != nil {
-		return err
-	}
-
-	err = writeProjectFile(config.Name, controllerPath, content)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func writeProjectFile(projectName string, relativePath string, content string) error {
-	completePath := filepath.Join(projectName, relativePath)
-	err := os.WriteFile(completePath, []byte(content), 0644)
-	if err != nil {
-		return fmt.Errorf("writing %s: %w", completePath, err)
-	}
 	return nil
 }
 
