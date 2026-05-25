@@ -8,9 +8,9 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "mtp",
+	Use:   "akit",
 	Short: "Generates API templates in certain languages and frameworks",
-	Long: `multi-templates is a CLI for scaffolding API projects 
+	Long: `Api-kit is a CLI for scaffolding API projects 
 by combining language, framework, project type and architecture.`,
 	SilenceErrors: true,
 	SilenceUsage:  true,

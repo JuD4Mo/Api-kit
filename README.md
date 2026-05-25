@@ -51,14 +51,14 @@ go install github.com/Jud4Mo/Api-kit/cmd/api-kit@latest
 **Interactive Mode:**
 Simply run the initialization command and follow the step-by-step prompts:
 ```bash
-api-kit new
+akit new
 ```
 *This will ask for the language, framework, architecture, and project name.*
 
 **Flag Mode (Non-interactive):**
 Ideal for CI/CD, scripts, or quick generation:
 ```bash
-api-kit new --lang=go --framework=gin --arch=layered --name=my-api
+akit new --lang=go --framework=gin --arch=layered --name=my-api
 ```
 
 ## Project Structure
