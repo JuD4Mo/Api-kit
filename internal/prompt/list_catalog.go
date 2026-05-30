@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Jud4Mo/multi-templates/internal/catalog"
+	"github.com/Jud4Mo/api-kit/internal/catalog"
 	"github.com/charmbracelet/lipgloss"
 )
 

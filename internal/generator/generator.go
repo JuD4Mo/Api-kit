@@ -9,8 +9,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/Jud4Mo/multi-templates/internal/catalog"
-	"github.com/Jud4Mo/multi-templates/internal/templates"
+	"github.com/Jud4Mo/api-kit/internal/catalog"
+	"github.com/Jud4Mo/api-kit/internal/templates"
 )
 
 type ProjectConfig struct {

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/Jud4Mo/multi-templates/internal/catalog"
-	"github.com/Jud4Mo/multi-templates/internal/generator"
-	"github.com/Jud4Mo/multi-templates/internal/prompt"
+	"github.com/Jud4Mo/api-kit/internal/catalog"
+	"github.com/Jud4Mo/api-kit/internal/generator"
+	"github.com/Jud4Mo/api-kit/internal/prompt"
 	"github.com/spf13/cobra"
 )
 

@@ -1,4 +1,4 @@
-module github.com/Jud4Mo/multi-templates
+module github.com/Jud4Mo/api-kit
 
 go 1.25.5
 

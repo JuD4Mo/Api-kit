@@ -3,7 +3,7 @@ package prompt
 import (
 	"strings"
 
-	"github.com/Jud4Mo/multi-templates/internal/catalog"
+	"github.com/Jud4Mo/api-kit/internal/catalog"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
