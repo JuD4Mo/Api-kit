@@ -1,0 +1,26 @@
+package com.api.service;
+
+import com.api.domain.Item;
+import com.api.repository.ItemRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class ItemService implements IItemService {
+    private final ItemRepository repository;
+
+    public ItemService(ItemRepository repository) {
+        this.repository = repository;
+    }
+
+    @Override
+    public List<Item> getItems() {
+        return repository.findAll();
+    }
+
+    @Override
+    public Item createItem(Item item) {
+        return repository.save(item);
+    }
+}

@@ -13,7 +13,7 @@ var Labels = map[string]string{
 	"go":            " Go",
 	"ts":            " TypeScript",
 	"java":          " Java",
-	"springboot":    " SpringBoot",
+	"springboot":    " Spring Boot",
 	"gin":           " Gin",
 	"echo":          " Echo",
 	"monolith":      " Monolith",

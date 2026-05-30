@@ -1,0 +1,27 @@
+package com.api.controller;
+
+import com.api.domain.Item;
+import com.api.service.IItemService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/items")
+public class ItemController {
+    private final IItemService service;
+
+    public ItemController(IItemService service) {
+        this.service = service;
+    }
+
+    @GetMapping
+    public List<Item> getItems() {
+        return service.getItems();
+    }
+
+    @PostMapping
+    public Item createItem(@RequestBody Item item) {
+        return service.createItem(item);
+    }
+}

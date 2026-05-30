@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -81,7 +80,6 @@ func Generate(config ProjectConfig) error {
 			if err != nil {
 				return err
 			}
-			log.Println(before)
 			return os.WriteFile(before, []byte(content), 0644)
 		}
 
