@@ -1,0 +1,13 @@
+items = [
+  { name: "Learn Rails", description: "Understand the Ruby on Rails framework" },
+  { name: "Build an API", description: "Create a RESTful API with Rails" },
+  { name: "Deploy", description: "Deploy the application to production" },
+]
+
+items.each do |attrs|
+  Item.find_or_create_by!(name: attrs[:name]) do |item|
+    item.description = attrs[:description]
+  end
+end
+
+puts "Seeded #{Item.count} items"
