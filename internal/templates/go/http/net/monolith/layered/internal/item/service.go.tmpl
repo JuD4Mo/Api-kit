@@ -1,0 +1,51 @@
+package item
+
+import (
+	"fmt"
+	"log"
+	"time"
+
+	"{{.Module}}/internal/domain"
+	"github.com/google/uuid"
+)
+
+type Service interface {
+	Create(name, description string) (*domain.Item, error)
+	GetByID(id string) (*domain.Item, error)
+}
+
+type service struct {
+	log  *log.Logger
+	repo Repository
+}
+
+func NewService(log *log.Logger, repo Repository) Service {
+	return &service{log: log, repo: repo}
+}
+
+func (s *service) Create(name, description string) (*domain.Item, error) {
+	s.log.Println("Create item service")
+
+	item := &domain.Item{
+		ID:          uuid.New().String(),
+		Name:        name,
+		Description: description,
+		Status:      "active",
+		CreatedAt:   time.Now(),
+	}
+
+	if err := s.repo.Create(item); err != nil {
+		return nil, fmt.Errorf("creating item: %w", err)
+	}
+
+	return item, nil
+}
+
+func (s *service) GetByID(id string) (*domain.Item, error) {
+	item, err := s.repo.GetByID(id)
+	if err != nil {
+		return nil, fmt.Errorf("getting item: %w", err)
+	}
+
+	return item, nil
+}

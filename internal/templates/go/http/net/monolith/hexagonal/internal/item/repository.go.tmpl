@@ -1,0 +1,34 @@
+package item
+
+import (
+	"errors"
+
+	"{{.Module}}/internal/domain"
+	"gorm.io/gorm"
+)
+
+type repo struct {
+	db *gorm.DB
+}
+
+func NewRepository(db *gorm.DB) Repository {
+	return &repo{db: db}
+}
+
+func (r *repo) Create(item *domain.Item) error {
+	return r.db.Create(item).Error
+}
+
+func (r *repo) GetByID(id string) (*domain.Item, error) {
+	var item domain.Item
+
+	result := r.db.First(&item, "id = ?", id)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, ErrNotFound
+		}
+		return nil, result.Error
+	}
+
+	return &item, nil
+}

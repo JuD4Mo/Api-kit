@@ -1,0 +1,40 @@
+package item
+
+import (
+	"log"
+
+	"{{.Module}}/internal/domain"
+	"gorm.io/gorm"
+)
+
+type Repository interface {
+	Create(item *domain.Item) error
+	GetByID(id string) (*domain.Item, error)
+}
+
+type repo struct {
+	log *log.Logger
+	db  *gorm.DB
+}
+
+func NewRepo(log *log.Logger, db *gorm.DB) Repository {
+	return &repo{log: log, db: db}
+}
+
+func (r *repo) Create(item *domain.Item) error {
+	if err := r.db.Create(item).Error; err != nil {
+		r.log.Println(err)
+		return err
+	}
+	r.log.Println("item created with id: ", item.ID)
+	return nil
+}
+
+func (r *repo) GetByID(id string) (*domain.Item, error) {
+	var item domain.Item
+	result := r.db.First(&item, "id = ?", id)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &item, nil
+}
