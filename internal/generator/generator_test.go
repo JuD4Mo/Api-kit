@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Jud4Mo/multi-templates/internal/catalog"
+	"github.com/Jud4Mo/api-kit/internal/catalog"
 )
 
 func TestGenerate(t *testing.T) {

@@ -1,6 +1,6 @@
 package prompt
 
-import "github.com/Jud4Mo/multi-templates/internal/catalog"
+import "github.com/Jud4Mo/api-kit/internal/catalog"
 
 type NewProjectInput struct {
 	Language     catalog.Language
