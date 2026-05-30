@@ -1,0 +1,40 @@
+# {{.ProjectName}}
+
+Ruby on Rails API with Layered Architecture.
+
+## Requirements
+
+- Ruby >= 3.1
+- Bundler
+
+## Setup
+
+```bash
+bundle install
+rails db:create db:migrate db:seed
+```
+
+## Run
+
+```bash
+rails server
+```
+
+## Structure
+
+```
+├── app/
+│   ├── controllers/     # HTTP layer (params, response)
+│   └── models/          # Business logic and persistence
+├── config/
+│   ├── routes.rb        # API routes
+│   └── database.yml     # Database configuration
+└── db/
+    ├── migrate/         # Schema migrations
+    └── seeds.rb         # Sample data
+```
+
+## Endpoints
+
+- `POST /items`       — Create an item
+- `GET  /items/:id`   — Get item by ID
