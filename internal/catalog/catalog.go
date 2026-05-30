@@ -9,11 +9,28 @@ type (
 	Architecture string
 )
 
+var Labels = map[string]string{
+	"go":            " Go",
+	"ts":            " TypeScript",
+	"java":          " Java",
+	"springboot":    " SpringBoot",
+	"gin":           " Gin",
+	"echo":          " Echo",
+	"monolith":      " Monolith",
+	"microservices": " Microservices",
+	"layered":       " Layered",
+	"hexagonal":     "󱃖 Hexagonal",
+	"clean":         " Clean",
+}
+
 const (
-	LanguageGo          Language     = "go"
-	FrameworkGin        Framework    = "gin"
-	ProjectTypeMonolith ProjectType  = "monolith"
-	ArchitectureLayered Architecture = "layered"
+	LanguageGo               Language     = "go"
+	FrameworkGin             Framework    = "gin"
+	ProjectTypeMonolith      ProjectType  = "monolith"
+	ArchitectureLayered      Architecture = "layered"
+	LanguageJava             Language     = "java"
+	FrameworkSpringBoot      Framework    = "springboot"
+	ProjectTypeMicroservices ProjectType  = "microservices"
 )
 
 type Stack struct {
@@ -33,6 +50,18 @@ func NewCatalog() Catalog {
 			{
 				Language:     LanguageGo,
 				Framework:    FrameworkGin,
+				ProjectType:  ProjectTypeMonolith,
+				Architecture: ArchitectureLayered,
+			},
+			{
+				Language:     LanguageGo,
+				Framework:    FrameworkGin,
+				ProjectType:  ProjectTypeMicroservices,
+				Architecture: ArchitectureLayered,
+			},
+			{
+				Language:     LanguageJava,
+				Framework:    FrameworkSpringBoot,
 				ProjectType:  ProjectTypeMonolith,
 				Architecture: ArchitectureLayered,
 			},

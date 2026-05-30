@@ -9,7 +9,7 @@ func TestLanguages(t *testing.T) {
 	c := NewCatalog()
 
 	got := c.Languages()
-	want := []Language{LanguageGo}
+	want := []Language{LanguageGo, LanguageJava}
 
 	if !slices.Equal(got, want) {
 		t.Errorf("Languages don't match -> want: %v - got: %v", want, got)
@@ -46,7 +46,7 @@ func TestProjectTypesByLanguageAndFramework(t *testing.T) {
 	c := NewCatalog()
 
 	got := c.ProjectTypesByLanguageAndFramework(LanguageGo, FrameworkGin)
-	want := []ProjectType{ProjectTypeMonolith}
+	want := []ProjectType{ProjectTypeMonolith, ProjectTypeMicroservices}
 
 	if !slices.Equal(got, want) {
 		t.Errorf("Project types don't match -> want: %v - got: %v", want, got)

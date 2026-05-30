@@ -5,6 +5,8 @@ import (
 
 	"github.com/Jud4Mo/multi-templates/internal/catalog"
 	"github.com/charmbracelet/huh"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 /*
@@ -14,7 +16,7 @@ using ~string means that we're allowing types whose underlying type is string
 func optionsFromValues[T ~string](values []T) []huh.Option[T] {
 	options := make([]huh.Option[T], 0)
 	for _, x := range values {
-		label := string(x)
+		label := FormatLabel(string(x))
 		option := huh.NewOption(label, x)
 		options = append(options, option)
 	}
@@ -122,4 +124,13 @@ func validateName(projectName string) error {
 		return fmt.Errorf("name can not be empty")
 	}
 	return nil
+}
+
+func formatLabel(label string) string {
+	if val, ok := catalog.Labels[label]; ok {
+		return val
+	} else {
+		caser := cases.Title(language.English)
+		return caser.String(val)
+	}
 }
