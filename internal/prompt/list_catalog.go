@@ -32,7 +32,7 @@ var (
 )
 
 func PrintCatalog(cat catalog.Catalog) {
-	fmt.Println(titleStyle.Render("󱚊 API-KIT Catalog"))
+	fmt.Println(titleStyle.Render(" API-KIT CATALOG"))
 
 	for _, lang := range cat.Languages() {
 		fmt.Println(langStyle.Render(FormatLabel(string(lang))))

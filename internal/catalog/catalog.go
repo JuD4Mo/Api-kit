@@ -54,12 +54,6 @@ func NewCatalog() Catalog {
 				Architecture: ArchitectureLayered,
 			},
 			{
-				Language:     LanguageGo,
-				Framework:    FrameworkGin,
-				ProjectType:  ProjectTypeMicroservices,
-				Architecture: ArchitectureLayered,
-			},
-			{
 				Language:     LanguageJava,
 				Framework:    FrameworkSpringBoot,
 				ProjectType:  ProjectTypeMonolith,
