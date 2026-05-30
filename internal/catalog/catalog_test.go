@@ -9,7 +9,7 @@ func TestLanguages(t *testing.T) {
 	c := NewCatalog()
 
 	got := c.Languages()
-	want := []Language{LanguageGo, LanguageJava}
+	want := []Language{LanguageGo, LanguageJava, LanguageRuby}
 
 	if !slices.Equal(got, want) {
 		t.Errorf("Languages don't match -> want: %v - got: %v", want, got)
@@ -20,7 +20,7 @@ func TestFrameworksByLanguage(t *testing.T) {
 	c := NewCatalog()
 	lang := LanguageGo
 	got := c.FrameworksByLanguage(lang)
-	want := []Framework{FrameworkGin}
+	want := []Framework{FrameworkGin, FrameworkChi, FramewrokHttpNet}
 
 	if !slices.Equal(got, want) {
 		t.Errorf("Frameworks don't match -> want: %v - got: %v", want, got)

@@ -21,6 +21,11 @@ var Labels = map[string]string{
 	"layered":       " Layered",
 	"hexagonal":     "󱃖 Hexagonal",
 	"clean":         " Clean",
+	"ruby":          " Ruby",
+	"rails":         "󰫏 Rails",
+	"python":        " Python",
+	"django":        " Django",
+	"http/net":      " http/net",
 }
 
 const (
@@ -31,6 +36,12 @@ const (
 	LanguageJava             Language     = "java"
 	FrameworkSpringBoot      Framework    = "springboot"
 	ProjectTypeMicroservices ProjectType  = "microservices"
+	LanguageRuby             Language     = "ruby"
+	FrameworkRails           Framework    = "rails"
+	Python                   Language     = "python"
+	FrameworkChi             Framework    = "chi"
+	FramewrokHttpNet         Framework    = "http/net"
+	ArchitectureHexagonal    Architecture = "hexagonal"
 )
 
 type Stack struct {
@@ -54,8 +65,38 @@ func NewCatalog() Catalog {
 				Architecture: ArchitectureLayered,
 			},
 			{
+				Language:     LanguageGo,
+				Framework:    FrameworkChi,
+				ProjectType:  ProjectTypeMonolith,
+				Architecture: ArchitectureLayered,
+			},
+			{
+				Language:     LanguageGo,
+				Framework:    FrameworkChi,
+				ProjectType:  ProjectTypeMonolith,
+				Architecture: ArchitectureHexagonal,
+			},
+			{
+				Language:     LanguageGo,
+				Framework:    FramewrokHttpNet,
+				ProjectType:  ProjectTypeMonolith,
+				Architecture: ArchitectureLayered,
+			},
+			{
+				Language:     LanguageGo,
+				Framework:    FramewrokHttpNet,
+				ProjectType:  ProjectTypeMonolith,
+				Architecture: ArchitectureHexagonal,
+			},
+			{
 				Language:     LanguageJava,
 				Framework:    FrameworkSpringBoot,
+				ProjectType:  ProjectTypeMonolith,
+				Architecture: ArchitectureLayered,
+			},
+			{
+				Language:     LanguageRuby,
+				Framework:    FrameworkRails,
 				ProjectType:  ProjectTypeMonolith,
 				Architecture: ArchitectureLayered,
 			},

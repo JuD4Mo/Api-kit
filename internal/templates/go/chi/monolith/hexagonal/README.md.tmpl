@@ -1,0 +1,30 @@
+# {{.ProjectName}}
+
+Go API with Chi router and Hexagonal Architecture.
+
+## Requirements
+
+- Go 1.22+
+
+## Run
+
+```bash
+go mod tidy
+go run ./cmd/api
+```
+
+## Structure
+
+```
+├── cmd/api/               # Entry point and dependency wiring
+├── internal/
+│   ├── domain/            # Pure domain entities
+│   ├── item/              # Item module (ports, service, handler)
+│   └── platform/          # Infrastructure layer (database, etc.)
+└── pkg/meta/              # Pagination helper
+```
+
+## Endpoints
+
+- `POST /items`       — Create an item
+- `GET  /items/{id}`  — Get item by ID

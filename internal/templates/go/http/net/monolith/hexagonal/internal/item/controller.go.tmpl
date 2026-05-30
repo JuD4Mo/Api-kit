@@ -1,0 +1,72 @@
+package item
+
+import (
+	"encoding/json"
+	"errors"
+	"net/http"
+
+	"gorm.io/gorm"
+)
+
+type Controller struct {
+	svc Service
+}
+
+func NewController(svc Service) *Controller {
+	return &Controller{svc: svc}
+}
+
+func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	if req.Name == "" {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "name is required"})
+		return
+	}
+
+	item, err := c.svc.Create(req.Name, req.Description)
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	writeJSON(w, http.StatusCreated, item)
+}
+
+func (c *Controller) GetByID(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	if id == "" {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "id is required"})
+		return
+	}
+
+	item, err := c.svc.GetByID(id)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			writeJSON(w, http.StatusNotFound, map[string]string{"error": "item not found"})
+			return
+		}
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			writeJSON(w, http.StatusNotFound, map[string]string{"error": "item not found"})
+			return
+		}
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return
+	}
+
+	writeJSON(w, http.StatusOK, item)
+}
+
+func writeJSON(w http.ResponseWriter, status int, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(data)
+}

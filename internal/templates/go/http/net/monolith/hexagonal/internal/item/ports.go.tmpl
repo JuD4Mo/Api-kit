@@ -1,0 +1,19 @@
+package item
+
+import (
+	"errors"
+
+	"{{.Module}}/internal/domain"
+)
+
+var ErrNotFound = errors.New("item not found")
+
+type Repository interface {
+	Create(item *domain.Item) error
+	GetByID(id string) (*domain.Item, error)
+}
+
+type Service interface {
+	Create(name, description string) (*domain.Item, error)
+	GetByID(id string) (*domain.Item, error)
+}
