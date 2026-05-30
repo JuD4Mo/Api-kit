@@ -37,7 +37,7 @@ This separates responsibilities clearly without overengineering, making it easy 
 
 **One command (recommended):**
 ```bash
-curl -fsSL https://github.com/JuD4Mo/api-kit/releases/latest/download/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/JuD4Mo/api-kit/main/install.sh | sh
 ```
 
 **With Go installed:**
