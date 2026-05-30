@@ -1,7 +1,26 @@
 # {{.ProjectName}}
 
-## Execute these commands
-go mod tidy
+This is a Go Monolith Layered API project using Gin and GORM, generated with `api-kit`.
 
-## Start web server
-go run ./cmd/api
+## Requirements
+- Go 1.22+
+
+## Run
+To run the application locally:
+```bash
+go mod tidy
+go run cmd/api/main.go
+```
+
+## Structure
+- `cmd/api/main.go`: Application entry point and router setup.
+- `pkg/bootstrap`: Database and logger initialization.
+- `internal/domain`: Domain models (Entities).
+- `internal/user`: User layer containing Repository, Service, and Endpoints (Controllers).
+
+## Endpoints
+- `GET /users`
+- `GET /users/:id`
+- `POST /users`
+- `PATCH /users/:id`
+- `DELETE /users/:id`

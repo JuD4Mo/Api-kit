@@ -1,0 +1,209 @@
+package user
+
+import (
+	"net/http"
+	"strconv"
+
+	"{{.Module}}/pkg/meta"
+	"github.com/gin-gonic/gin"
+)
+
+type (
+	Endpoints struct {
+		Create gin.HandlerFunc
+		Get    gin.HandlerFunc
+		GetAll gin.HandlerFunc
+		Update gin.HandlerFunc
+		Delete gin.HandlerFunc
+	}
+
+	CreateReq struct {
+		FirstName string `json:"first_name" binding:"required"`
+		LastName  string `json:"last_name" binding:"required"`
+		Email     string `json:"email"`
+		Phone     string `json:"phone"`
+	}
+
+	UpdateReq struct {
+		FirstName *string `json:"first_name"`
+		LastName  *string `json:"last_name"`
+		Email     *string `json:"email"`
+		Phone     *string `json:"phone"`
+	}
+
+	Response struct {
+		Status int         `json:"status"`
+		Data   interface{} `json:"data,omitempty"`
+		Err    string      `json:"error,omitempty"`
+		Meta   *meta.Meta  `json:"meta,omitempty"`
+	}
+)
+
+func MakeEndpoints(s Service) Endpoints {
+	return Endpoints{
+		Create: makeCreateEndpoint(s),
+		Get:    makeGetEndpoint(s),
+		GetAll: makeGetAllEndpoint(s),
+		Update: makeUpdateEndpoint(s),
+		Delete: makeDeleteEndpoint(s),
+	}
+}
+
+func makeCreateEndpoint(s Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req CreateReq
+
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, Response{
+				Status: http.StatusBadRequest,
+				Err:    err.Error(),
+			})
+			return
+		}
+
+		user, err := s.Create(req.FirstName, req.LastName, req.Email, req.Phone)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, Response{
+				Status: http.StatusBadRequest,
+				Err:    err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusCreated, Response{
+			Status: http.StatusCreated,
+			Data:   user,
+		})
+	}
+}
+
+func makeGetEndpoint(s Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		
+		user, err := s.Get(id)
+		if err != nil {
+			c.JSON(http.StatusNotFound, Response{
+				Status: http.StatusNotFound,
+				Err:    "user does not exist",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, Response{
+			Status: http.StatusOK,
+			Data:   user,
+		})
+	}
+}
+
+func makeGetAllEndpoint(s Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		filters := Filters{
+			FirstName: c.Query("first_name"),
+			LastName:  c.Query("last_name"),
+		}
+
+		limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+		page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+
+		quant, err := s.Count(filters)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, Response{
+				Status: http.StatusInternalServerError,
+				Err:    err.Error(),
+			})
+			return
+		}
+
+		meta, err := meta.New(page, limit, quant)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, Response{
+				Status: http.StatusInternalServerError,
+				Err:    err.Error(),
+			})
+			return
+		}
+
+		users, err := s.GetAll(filters, meta.Offset(), meta.Limit)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, Response{
+				Status: http.StatusBadRequest,
+				Err:    err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, Response{
+			Status: http.StatusOK,
+			Data:   users,
+			Meta:   meta,
+		})
+	}
+}
+
+func makeUpdateEndpoint(s Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var updateReq UpdateReq
+
+		if err := c.ShouldBindJSON(&updateReq); err != nil {
+			c.JSON(http.StatusBadRequest, Response{
+				Status: http.StatusBadRequest,
+				Err:    err.Error(),
+			})
+			return
+		}
+
+		if updateReq.FirstName != nil && *updateReq.FirstName == "" {
+			c.JSON(http.StatusBadRequest, Response{
+				Status: http.StatusBadRequest,
+				Err:    "first name is required if provided",
+			})
+			return
+		}
+
+		if updateReq.LastName != nil && *updateReq.LastName == "" {
+			c.JSON(http.StatusBadRequest, Response{
+				Status: http.StatusBadRequest,
+				Err:    "last name is required if provided",
+			})
+			return
+		}
+
+		id := c.Param("id")
+
+		err := s.Update(id, updateReq.FirstName, updateReq.LastName, updateReq.Email, updateReq.Phone)
+		if err != nil {
+			c.JSON(http.StatusNotFound, Response{
+				Status: http.StatusNotFound,
+				Err:    "user does not exist or update failed",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, Response{
+			Status: http.StatusOK,
+			Data:   map[string]string{"message": "updated!"},
+		})
+	}
+}
+
+func makeDeleteEndpoint(s Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		
+		err := s.Delete(id)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, Response{
+				Status: http.StatusBadRequest,
+				Err:    err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, Response{
+			Status: http.StatusOK,
+			Data:   map[string]string{"response": "deleted complete"},
+		})
+	}
+}

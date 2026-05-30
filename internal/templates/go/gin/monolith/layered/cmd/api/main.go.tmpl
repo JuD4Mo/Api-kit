@@ -1,25 +1,46 @@
 package main
 
 import (
-	"net/http"
+	"log"
+
+	"{{.Module}}/internal/user"
 	"{{.Module}}/pkg/bootstrap"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	logger := bootstrap.InitLogger()
+	// Cargamos variables de entorno (ignorar si no existe el archivo)
+	_ = godotenv.Load()
 
-	r := gin.Default()
+	// Inicializamos logger y BD (SQLite en memoria/local)
+	l := bootstrap.InitLogger()
+	db, err := bootstrap.DBConnection()
+	if err != nil {
+		l.Fatal(err)
+	}
 
-	r.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "alive :D",
-		})
-	})
+	// Instanciamos el router de Gin
+	router := gin.Default()
 
-	logger.Println("server listening on port :8080")
-  
-	if err := r.Run(":8080"); err != nil {
-		logger.Fatal(err)
+	// Inyección de dependencias para User
+	userRepo := user.NewRepo(l, db)
+	userService := user.NewService(l, userRepo)
+	userEnd := user.MakeEndpoints(userService)
+
+	// Registramos los endpoints de User
+	userGroup := router.Group("/users")
+	{
+		userGroup.POST("", userEnd.Create)
+		userGroup.GET("/:id", userEnd.Get)
+		userGroup.GET("", userEnd.GetAll)
+		userGroup.PATCH("/:id", userEnd.Update)
+		userGroup.DELETE("/:id", userEnd.Delete)
+	}
+
+	log.Println("Server running on port 8000")
+	// Levantamos el servidor
+	if err := router.Run(":8000"); err != nil {
+		l.Fatal(err)
 	}
 }

@@ -46,7 +46,7 @@ func TestProjectTypesByLanguageAndFramework(t *testing.T) {
 	c := NewCatalog()
 
 	got := c.ProjectTypesByLanguageAndFramework(LanguageGo, FrameworkGin)
-	want := []ProjectType{ProjectTypeMonolith, ProjectTypeMicroservices}
+	want := []ProjectType{ProjectTypeMonolith}
 
 	if !slices.Equal(got, want) {
 		t.Errorf("Project types don't match -> want: %v - got: %v", want, got)
