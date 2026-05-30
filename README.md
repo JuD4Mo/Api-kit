@@ -47,6 +47,8 @@ go install github.com/Jud4Mo/Api-kit/cmd/api-kit@latest
 
 **Manual:** Download the archive for your OS from [Releases](https://github.com/JuD4Mo/api-kit/releases), extract, and move `akit` to a directory in your `$PATH`.
 
+> **Note:** The interactive prompts and `list-catalog` use Nerd Font icons. If you see rectangles (□□□) instead of icons, install a [Nerd Font](https://www.nerdfonts.com/) (e.g., `CascadiaCode NF`, `FiraCode NF`, `JetBrainsMono NF`) and set it as your terminal font. The tool works fine without it — you'll see the text labels as expected.
+
 ### Usage
 
 **Interactive Mode:**
@@ -61,6 +63,12 @@ Ideal for CI/CD, scripts, or quick generation:
 ```bash
 akit new --lang=go --framework=gin --arch=layered --name=my-api
 ```
+
+**List available templates:**
+```bash
+akit list-catalog
+```
+*Shows all supported languages, frameworks, project types, and architectures in a tree view.*
 
 ## Project Structure
 
