@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"{{.Module}}/internal/domain"
+	"{{.Module}}/internal/item"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -19,7 +19,7 @@ func DBConnection() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	err = db.AutoMigrate(&domain.Item{})
+	err = db.AutoMigrate(&item.Item{})
 	if err != nil {
 		return nil, err
 	}

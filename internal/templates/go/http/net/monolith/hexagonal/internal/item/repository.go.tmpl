@@ -1,9 +1,9 @@
 package item
 
 import (
+	"context"
 	"errors"
 
-	"{{.Module}}/internal/domain"
 	"gorm.io/gorm"
 )
 
@@ -15,14 +15,14 @@ func NewRepository(db *gorm.DB) Repository {
 	return &repo{db: db}
 }
 
-func (r *repo) Create(item *domain.Item) error {
-	return r.db.Create(item).Error
+func (r *repo) Create(ctx context.Context, item *Item) error {
+	return r.db.WithContext(ctx).Create(item).Error
 }
 
-func (r *repo) GetByID(id string) (*domain.Item, error) {
-	var item domain.Item
+func (r *repo) GetByID(ctx context.Context, id string) (*Item, error) {
+	var item Item
 
-	result := r.db.First(&item, "id = ?", id)
+	result := r.db.WithContext(ctx).First(&item, "id = ?", id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, ErrNotFound
