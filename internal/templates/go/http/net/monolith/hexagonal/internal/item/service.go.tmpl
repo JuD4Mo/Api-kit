@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"{{.Module}}/internal/domain"
 	"github.com/google/uuid"
 )
 
@@ -16,8 +15,8 @@ func NewService(repo Repository) Service {
 	return &service{repo: repo}
 }
 
-func (s *service) Create(name, description string) (*domain.Item, error) {
-	item := &domain.Item{
+func (s *service) Create(name, description string) (*Item, error) {
+	item := &Item{
 		ID:          uuid.New().String(),
 		Name:        name,
 		Description: description,
@@ -32,7 +31,7 @@ func (s *service) Create(name, description string) (*domain.Item, error) {
 	return item, nil
 }
 
-func (s *service) GetByID(id string) (*domain.Item, error) {
+func (s *service) GetByID(id string) (*Item, error) {
 	item, err := s.repo.GetByID(id)
 	if err != nil {
 		return nil, fmt.Errorf("getting item: %w", err)

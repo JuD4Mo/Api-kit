@@ -5,14 +5,13 @@ import (
 	"log"
 	"strings"
 
-	"{{.Module}}/internal/domain"
 	"gorm.io/gorm"
 )
 
 type Repository interface {
-	Create(user *domain.User) error
-	GetAll(filters Filters, offset, limit int) ([]domain.User, error)
-	Get(id string) (*domain.User, error)
+	Create(user *User) error
+	GetAll(filters Filters, offset, limit int) ([]User, error)
+	Get(id string) (*User, error)
 	Delete(id string) error
 	Update(id string, firstName, lastName, email, phone *string) error
 	Count(filters Filters) (int, error)
@@ -30,7 +29,7 @@ func NewRepo(log *log.Logger, db *gorm.DB) Repository {
 	}
 }
 
-func (r *repo) Create(user *domain.User) error {
+func (r *repo) Create(user *User) error {
 	if err := r.db.Create(user).Error; err != nil {
 		r.log.Println(err)
 		return err
@@ -39,8 +38,8 @@ func (r *repo) Create(user *domain.User) error {
 	return nil
 }
 
-func (r *repo) GetAll(filters Filters, offset, limit int) ([]domain.User, error) {
-	var u []domain.User
+func (r *repo) GetAll(filters Filters, offset, limit int) ([]User, error) {
+	var u []User
 
 	tx := r.db.Model(&u)
 	tx = applyFilters(tx, filters)
@@ -54,8 +53,8 @@ func (r *repo) GetAll(filters Filters, offset, limit int) ([]domain.User, error)
 	return u, nil
 }
 
-func (r *repo) Get(id string) (*domain.User, error) {
-	user := domain.User{ID: id}
+func (r *repo) Get(id string) (*User, error) {
+	user := User{ID: id}
 
 	result := r.db.First(&user)
 
@@ -67,7 +66,7 @@ func (r *repo) Get(id string) (*domain.User, error) {
 }
 
 func (r *repo) Delete(id string) error {
-	user := domain.User{
+	user := User{
 		ID: id,
 	}
 	result := r.db.Delete(&user)
@@ -94,7 +93,7 @@ func (r *repo) Update(id string, firstName, lastName, email, phone *string) erro
 		values["phone"] = *phone
 	}
 
-	res := r.db.Model(&domain.User{}).Where("id = ?", id).Updates(values)
+	res := r.db.Model(&User{}).Where("id = ?", id).Updates(values)
 	if res.Error != nil {
 		return res.Error
 	}
@@ -103,7 +102,7 @@ func (r *repo) Update(id string, firstName, lastName, email, phone *string) erro
 
 func (r *repo) Count(filters Filters) (int, error) {
 	var count int64
-	tx := r.db.Model(&domain.User{})
+	tx := r.db.Model(&User{})
 	tx = applyFilters(tx, filters)
 
 	result := tx.Count(&count)

@@ -3,13 +3,12 @@ package item
 import (
 	"log"
 
-	"{{.Module}}/internal/domain"
 	"gorm.io/gorm"
 )
 
 type Repository interface {
-	Create(item *domain.Item) error
-	GetByID(id string) (*domain.Item, error)
+	Create(item *Item) error
+	GetByID(id string) (*Item, error)
 }
 
 type repo struct {
@@ -21,7 +20,7 @@ func NewRepo(log *log.Logger, db *gorm.DB) Repository {
 	return &repo{log: log, db: db}
 }
 
-func (r *repo) Create(item *domain.Item) error {
+func (r *repo) Create(item *Item) error {
 	if err := r.db.Create(item).Error; err != nil {
 		r.log.Println(err)
 		return err
@@ -30,8 +29,8 @@ func (r *repo) Create(item *domain.Item) error {
 	return nil
 }
 
-func (r *repo) GetByID(id string) (*domain.Item, error) {
-	var item domain.Item
+func (r *repo) GetByID(id string) (*Item, error) {
+	var item Item
 	result := r.db.First(&item, "id = ?", id)
 	if result.Error != nil {
 		return nil, result.Error

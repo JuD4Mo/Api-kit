@@ -5,13 +5,12 @@ import (
 	"log"
 	"time"
 
-	"{{.Module}}/internal/domain"
 	"github.com/google/uuid"
 )
 
 type Service interface {
-	Create(name, description string) (*domain.Item, error)
-	GetByID(id string) (*domain.Item, error)
+	Create(name, description string) (*Item, error)
+	GetByID(id string) (*Item, error)
 }
 
 type service struct {
@@ -23,10 +22,10 @@ func NewService(log *log.Logger, repo Repository) Service {
 	return &service{log: log, repo: repo}
 }
 
-func (s *service) Create(name, description string) (*domain.Item, error) {
+func (s *service) Create(name, description string) (*Item, error) {
 	s.log.Println("Create item service")
 
-	item := &domain.Item{
+	item := &Item{
 		ID:          uuid.New().String(),
 		Name:        name,
 		Description: description,
@@ -41,7 +40,7 @@ func (s *service) Create(name, description string) (*domain.Item, error) {
 	return item, nil
 }
 
-func (s *service) GetByID(id string) (*domain.Item, error) {
+func (s *service) GetByID(id string) (*Item, error) {
 	item, err := s.repo.GetByID(id)
 	if err != nil {
 		return nil, fmt.Errorf("getting item: %w", err)
