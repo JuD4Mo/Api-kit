@@ -32,7 +32,7 @@ func (c *Controller) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	item, err := c.svc.Create(req.Name, req.Description)
+	item, err := c.svc.Create(r.Context(), req.Name, req.Description)
 	if err != nil {
 		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		return
@@ -48,7 +48,7 @@ func (c *Controller) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	item, err := c.svc.GetByID(id)
+	item, err := c.svc.GetByID(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, ErrNotFound) {
 			writeJSON(w, http.StatusNotFound, map[string]string{"error": "item not found"})

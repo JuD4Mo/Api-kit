@@ -25,7 +25,7 @@ func main() {
 
 	// Inyección de dependencias para User
 	userRepo := user.NewRepo(l, db)
-	userService := user.NewService(l, userRepo)
+	userService := user.NewService(userRepo)
 	userEnd := user.MakeEndpoints(userService)
 
 	// Registramos los endpoints de User

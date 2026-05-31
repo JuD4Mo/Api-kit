@@ -61,7 +61,7 @@ func makeCreateEndpoint(s Service) gin.HandlerFunc {
 			return
 		}
 
-		user, err := s.Create(req.FirstName, req.LastName, req.Email, req.Phone)
+		user, err := s.Create(c.Request.Context(), req.FirstName, req.LastName, req.Email, req.Phone)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, Response{
 				Status: http.StatusBadRequest,
@@ -81,7 +81,7 @@ func makeGetEndpoint(s Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		
-		user, err := s.Get(id)
+		user, err := s.Get(c.Request.Context(), id)
 		if err != nil {
 			c.JSON(http.StatusNotFound, Response{
 				Status: http.StatusNotFound,
@@ -107,7 +107,7 @@ func makeGetAllEndpoint(s Service) gin.HandlerFunc {
 		limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 		page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 
-		quant, err := s.Count(filters)
+		quant, err := s.Count(c.Request.Context(), filters)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, Response{
 				Status: http.StatusInternalServerError,
@@ -125,7 +125,7 @@ func makeGetAllEndpoint(s Service) gin.HandlerFunc {
 			return
 		}
 
-		users, err := s.GetAll(filters, meta.Offset(), meta.Limit)
+		users, err := s.GetAll(c.Request.Context(), filters, meta.Offset(), meta.Limit)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, Response{
 				Status: http.StatusBadRequest,
@@ -172,7 +172,7 @@ func makeUpdateEndpoint(s Service) gin.HandlerFunc {
 
 		id := c.Param("id")
 
-		err := s.Update(id, updateReq.FirstName, updateReq.LastName, updateReq.Email, updateReq.Phone)
+		err := s.Update(c.Request.Context(), id, updateReq.FirstName, updateReq.LastName, updateReq.Email, updateReq.Phone)
 		if err != nil {
 			c.JSON(http.StatusNotFound, Response{
 				Status: http.StatusNotFound,
@@ -192,7 +192,7 @@ func makeDeleteEndpoint(s Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		
-		err := s.Delete(id)
+		err := s.Delete(c.Request.Context(), id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, Response{
 				Status: http.StatusBadRequest,

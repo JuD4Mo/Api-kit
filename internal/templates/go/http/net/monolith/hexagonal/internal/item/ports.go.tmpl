@@ -1,15 +1,18 @@
 package item
 
-import "errors"
+import (
+	"context"
+	"errors"
+)
 
 var ErrNotFound = errors.New("item not found")
 
 type Repository interface {
-	Create(item *Item) error
-	GetByID(id string) (*Item, error)
+	Create(ctx context.Context, item *Item) error
+	GetByID(ctx context.Context, id string) (*Item, error)
 }
 
 type Service interface {
-	Create(name, description string) (*Item, error)
-	GetByID(id string) (*Item, error)
+	Create(ctx context.Context, name, description string) (*Item, error)
+	GetByID(ctx context.Context, id string) (*Item, error)
 }
