@@ -16,13 +16,16 @@ var (
 	newArch        string
 	newProjectType string
 	newName        string
+	newModule      string
 )
 
 var newCmd = &cobra.Command{
 	Use:   "new",
 	Short: "Generate a project from a template",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		input := prompt.NewProjectInputFromFlags(newLang, newFramework, newProjectType, newArch, newName)
+		PrintBanner()
+
+		input := prompt.NewProjectInputFromFlags(newLang, newFramework, newProjectType, newArch, newName, newModule)
 		cat := catalog.NewCatalog()
 
 		err := validateProvidedProjectInputByFlags(cat, input)
@@ -46,7 +49,7 @@ var newCmd = &cobra.Command{
 			ProjectType:  input.ProjectType,
 			Architecture: input.Architecture,
 			Name:         input.Name,
-			Module:       input.Name,
+			Module:       input.Module,
 		}
 
 		err = generator.Generate(projectConfig)
@@ -60,6 +63,7 @@ var newCmd = &cobra.Command{
 		fmt.Println(" type:         ", input.ProjectType)
 		fmt.Println(" architecture: ", input.Architecture)
 		fmt.Println(" name:         ", input.Name)
+		fmt.Println(" module:       ", projectConfig.Module)
 		return nil
 	},
 }
@@ -71,6 +75,7 @@ func init() {
 	newCmd.Flags().StringVar(&newArch, "arch", "", "Code level architecture (layered, hexagonal, clean...)")
 	newCmd.Flags().StringVar(&newProjectType, "type", "", "System level architecture (monolith, microservices...)")
 	newCmd.Flags().StringVar(&newName, "name", "", "Name of the project to be created")
+	newCmd.Flags().StringVar(&newModule, "module", "", "Go module path (e.g. github.com/username/project) — auto-falls back to project name if empty")
 
 	rootCmd.AddCommand(newCmd)
 }
