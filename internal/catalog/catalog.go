@@ -20,6 +20,7 @@ var Labels = map[string]string{
 	"microservices": " Microservices",
 	"layered":       " Layered",
 	"hexagonal":     "󱃖 Hexagonal",
+	"sriniously":    "󰛨 Hexagonal Sriniously-based",
 	"clean":         " Clean",
 	"ruby":          " Ruby",
 	"rails":         "󰫏 Rails",
@@ -42,6 +43,7 @@ const (
 	FrameworkChi             Framework    = "chi"
 	FramewrokHttpNet         Framework    = "http/net"
 	ArchitectureHexagonal    Architecture = "hexagonal"
+	ArchitectureSriniously   Architecture = "sriniously"
 )
 
 type Stack struct {
@@ -75,6 +77,12 @@ func NewCatalog() Catalog {
 				Framework:    FrameworkChi,
 				ProjectType:  ProjectTypeMonolith,
 				Architecture: ArchitectureHexagonal,
+			},
+			{
+				Language:     LanguageGo,
+				Framework:    FrameworkChi,
+				ProjectType:  ProjectTypeMonolith,
+				Architecture: ArchitectureSriniously,
 			},
 			{
 				Language:     LanguageGo,

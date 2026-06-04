@@ -64,6 +64,17 @@ func TestArchitecturesByBase(t *testing.T) {
 	}
 }
 
+func TestArchitecturesByBaseChi(t *testing.T) {
+	c := NewCatalog()
+
+	got := c.ArchitecturesByBase(LanguageGo, FrameworkChi, ProjectTypeMonolith)
+	want := []Architecture{ArchitectureLayered, ArchitectureHexagonal, ArchitectureSriniously}
+
+	if !slices.Equal(got, want) {
+		t.Errorf("Architecture types don't match -> want: %v - got: %v", want, got)
+	}
+}
+
 func TestIsSupportedNegative(t *testing.T) {
 	c := NewCatalog()
 	lang := Language("java")

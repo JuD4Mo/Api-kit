@@ -5,9 +5,10 @@ import (
 
 	"github.com/Jud4Mo/api-kit/internal/catalog"
 	"github.com/charmbracelet/huh"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
+
+// moduleLang is used to conditionally show the module input only for Go projects.
+const moduleLang catalog.Language = "go"
 
 /*
 Generics use case:
@@ -116,6 +117,22 @@ func AskNewProjectInput(cat catalog.Catalog, input NewProjectInput) (NewProjectI
 		}
 	}
 
+	if input.Module == "" && input.Language == moduleLang {
+		moduleInput := huh.NewInput().
+			Title("What is the Go module path?").
+			Description("e.g. github.com/username/project").
+			Value(&input.Module)
+
+		err := huh.NewForm(
+			huh.NewGroup(
+				moduleInput,
+			),
+		).Run()
+		if err != nil {
+			return input, fmt.Errorf("run new project prompt: %w", err)
+		}
+	}
+
 	return input, nil
 }
 
@@ -124,13 +141,4 @@ func validateName(projectName string) error {
 		return fmt.Errorf("name can not be empty")
 	}
 	return nil
-}
-
-func formatLabel(label string) string {
-	if val, ok := catalog.Labels[label]; ok {
-		return val
-	} else {
-		caser := cases.Title(language.English)
-		return caser.String(val)
-	}
 }

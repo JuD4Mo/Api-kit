@@ -1,0 +1,92 @@
+package item
+
+import (
+	"encoding/json"
+	"errors"
+	"net/http"
+
+	"{{.Module}}/internal/errs"
+	"{{.Module}}/internal/sqlerr"
+	"{{.Module}}/internal/validation"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/rs/zerolog"
+)
+
+type Controller struct {
+	svc Service
+}
+
+func NewController(svc Service) *Controller {
+	return &Controller{svc: svc}
+}
+
+type CreateItemRequest struct {
+	Name        string `json:"name" validate:"required"`
+	Description string `json:"description"`
+}
+
+func (r *CreateItemRequest) Validate() error {
+	return nil
+}
+
+func (h *Controller) Create(w http.ResponseWriter, r *http.Request) {
+	var req CreateItemRequest
+
+	if err := validation.BindAndValidate(r, &req); err != nil {
+		writeError(w, err)
+		return
+	}
+
+	item, err := h.svc.Create(r.Context(), req.Name, req.Description)
+	if err != nil {
+		logger := zerolog.Ctx(r.Context())
+		logger.Error().Err(err).Msg("failed to create item")
+		writeError(w, err)
+		return
+	}
+
+	writeJSON(w, http.StatusCreated, item)
+}
+
+func (h *Controller) GetByID(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		writeError(w, errs.NewBadRequestError("id is required", false, nil, nil, nil))
+		return
+	}
+
+	item, err := h.svc.GetByID(r.Context(), id)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			writeError(w, errs.NewNotFoundError("item not found", false, nil))
+			return
+		}
+		writeError(w, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, item)
+}
+
+func writeJSON(w http.ResponseWriter, status int, data interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(data)
+}
+
+func writeError(w http.ResponseWriter, err error) {
+	var httpErr *errs.HTTPError
+	if errors.As(err, &httpErr) {
+		writeJSON(w, httpErr.Status, httpErr)
+		return
+	}
+
+	converted := sqlerr.HandleError(err)
+	if errors.As(converted, &httpErr) {
+		writeJSON(w, httpErr.Status, httpErr)
+		return
+	}
+
+	writeJSON(w, http.StatusInternalServerError, errs.NewInternalServerError())
+}
