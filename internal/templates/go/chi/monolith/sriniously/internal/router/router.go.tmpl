@@ -1,0 +1,39 @@
+package router
+
+import (
+	"net/http"
+
+	"{{.Module}}/internal/item"
+	"{{.Module}}/internal/middleware"
+	"{{.Module}}/internal/server"
+
+	"github.com/go-chi/chi/v5"
+)
+
+func NewRouter(s *server.Server, itemCtrl *item.Controller) *chi.Mux {
+	r := chi.NewRouter()
+
+	globalMw := middleware.NewGlobalMiddlewares(s)
+
+	r.Use(globalMw.Recover)
+	r.Use(globalMw.RequestLogger)
+	r.Use(globalMw.CORS)
+
+	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
+
+	r.Route("/api/v1", func(r chi.Router) {
+		r.Mount("/items", itemRoutes(itemCtrl))
+	})
+
+	return r
+}
+
+func itemRoutes(ctrl *item.Controller) chi.Router {
+	r := chi.NewRouter()
+	r.Post("/", ctrl.Create)
+	r.Get("/{id}", ctrl.GetByID)
+	return r
+}

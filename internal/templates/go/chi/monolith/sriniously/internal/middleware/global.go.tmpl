@@ -1,0 +1,105 @@
+package middleware
+
+import (
+	"encoding/json"
+	"net/http"
+	"runtime/debug"
+	"time"
+
+	"{{.Module}}/internal/errs"
+	"{{.Module}}/internal/server"
+
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
+)
+
+type GlobalMiddlewares struct {
+	server *server.Server
+}
+
+func NewGlobalMiddlewares(s *server.Server) *GlobalMiddlewares {
+	return &GlobalMiddlewares{
+		server: s,
+	}
+}
+
+func (global *GlobalMiddlewares) CORS(next http.Handler) http.Handler {
+	options := cors.Options{
+		AllowedOrigins:   global.server.Config.Server.CORSAllowedOrigins,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}
+	return cors.Handler(options)(next)
+}
+
+func (global *GlobalMiddlewares) RequestLogger(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
+		reqID := r.Header.Get("X-Request-Id")
+		if reqID == "" {
+			reqID = middleware.GetReqID(r.Context())
+		}
+		if reqID == "" {
+			reqID = "req-" + time.Now().Format("20060102150405.000")
+		}
+
+		w.Header().Set("X-Request-Id", reqID)
+
+		logger := global.server.Logger.With().
+			Str("request_id", reqID).
+			Str("method", r.Method).
+			Str("path", r.URL.Path).
+			Str("ip", r.RemoteAddr).
+			Logger()
+
+		ctx := logger.WithContext(r.Context())
+		r = r.WithContext(ctx)
+
+		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
+
+		next.ServeHTTP(ww, r)
+
+		latency := time.Since(start)
+		status := ww.Status()
+
+		logEvent := logger.Info()
+		if status >= 500 {
+			logEvent = logger.Error()
+		} else if status >= 400 {
+			logEvent = logger.Warn()
+		}
+
+		logEvent.
+			Int("status", status).
+			Dur("latency", latency).
+			Int("bytes_written", ww.BytesWritten()).
+			Msg("request processed")
+	})
+}
+
+func (global *GlobalMiddlewares) Recover(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if rvr := recover(); rvr != nil {
+				logger := global.server.Logger
+
+				logger.Error().
+					Interface("panic", rvr).
+					Bytes("stack", debug.Stack()).
+					Msg("panic recovered")
+
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusInternalServerError)
+
+				internalErr := errs.NewInternalServerError()
+				json.NewEncoder(w).Encode(internalErr)
+			}
+		}()
+
+		next.ServeHTTP(w, r)
+	})
+}
