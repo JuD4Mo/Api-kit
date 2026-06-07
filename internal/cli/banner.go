@@ -22,6 +22,6 @@ func PrintBanner() {
       |_|                       
 `))
 	fmt.Println(secondary.Render("  api-kit — project scaffolder"))
-	fmt.Println(muted.Render("  answer a few questions and get a project ready"))
+	fmt.Println(muted.Render("  version " + Version + " — answer a few questions and get a project ready"))
 	fmt.Println()
 }

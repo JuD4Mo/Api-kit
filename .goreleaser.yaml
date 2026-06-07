@@ -9,6 +9,8 @@ builds:
     binary: akit
     env:
       - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X github.com/Jud4Mo/api-kit/internal/cli.Version={{ .Version }}
     goos:
       - linux
       - windows
