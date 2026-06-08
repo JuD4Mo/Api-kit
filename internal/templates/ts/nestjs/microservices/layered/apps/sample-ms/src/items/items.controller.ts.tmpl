@@ -1,0 +1,18 @@
+import { Controller } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { ItemsService } from './items.service';
+
+@Controller()
+export class ItemsController {
+  constructor(private readonly service: ItemsService) {}
+
+  @MessagePattern({ cmd: 'createItem' })
+  create(@Payload() data: { name: string; description?: string }) {
+    return this.service.create(data);
+  }
+
+  @MessagePattern({ cmd: 'getItemById' })
+  getById(@Payload() data: { id: string }) {
+    return this.service.getById(data.id);
+  }
+}

@@ -1,0 +1,19 @@
+import { Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { lastValueFrom } from 'rxjs';
+import { CreateItemDto } from './dto/create-item.dto';
+
+@Injectable()
+export class ItemsService {
+  async create(dto: CreateItemDto, nats: ClientProxy) {
+    return lastValueFrom(
+      nats.send({ cmd: 'createItem' }, dto),
+    );
+  }
+
+  async getById(id: string, nats: ClientProxy) {
+    return lastValueFrom(
+      nats.send({ cmd: 'getItemById' }, { id }),
+    );
+  }
+}

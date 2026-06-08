@@ -11,8 +11,10 @@ type (
 
 var Labels = map[string]string{
 	"go":            " Go",
-	"ts":            " TypeScript",
+	"ts":            " TypeScript",
+	"js":            " JavaScript",
 	"java":          " Java",
+	"nestjs":        " NestJS",
 	"springboot":    " Spring Boot",
 	"gin":           " Gin",
 	"echo":          " Echo",
@@ -37,6 +39,8 @@ const (
 	LanguageJava             Language     = "java"
 	FrameworkSpringBoot      Framework    = "springboot"
 	ProjectTypeMicroservices ProjectType  = "microservices"
+	LanguageTs               Language     = "ts"
+	FrameworkNestJS          Framework    = "nestjs"
 	LanguageRuby             Language     = "ruby"
 	FrameworkRails           Framework    = "rails"
 	Python                   Language     = "python"
@@ -102,12 +106,18 @@ func NewCatalog() Catalog {
 				ProjectType:  ProjectTypeMonolith,
 				Architecture: ArchitectureLayered,
 			},
-			{
-				Language:     LanguageRuby,
-				Framework:    FrameworkRails,
-				ProjectType:  ProjectTypeMonolith,
-				Architecture: ArchitectureLayered,
-			},
+		{
+			Language:     LanguageRuby,
+			Framework:    FrameworkRails,
+			ProjectType:  ProjectTypeMonolith,
+			Architecture: ArchitectureLayered,
+		},
+		{
+			Language:     LanguageTs,
+			Framework:    FrameworkNestJS,
+			ProjectType:  ProjectTypeMicroservices,
+			Architecture: ArchitectureLayered,
+		},
 		},
 	}
 }

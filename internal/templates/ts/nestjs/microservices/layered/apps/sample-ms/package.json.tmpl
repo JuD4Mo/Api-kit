@@ -1,0 +1,22 @@
+{
+  "name": "@{{.ProjectName}}/sample-ms",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "nest build sample-ms",
+    "start": "node dist/apps/sample-ms/main",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push"
+  },
+  "dependencies": {
+    "@nestjs/microservices": "^11.0.0",
+    "@prisma/client": "^6.0.0",
+    "nats": "^2.28.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "joi": "^17.13.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.0.0"
+  }
+}

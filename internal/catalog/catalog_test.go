@@ -9,7 +9,7 @@ func TestLanguages(t *testing.T) {
 	c := NewCatalog()
 
 	got := c.Languages()
-	want := []Language{LanguageGo, LanguageJava, LanguageRuby}
+	want := []Language{LanguageGo, LanguageJava, LanguageRuby, LanguageTs}
 
 	if !slices.Equal(got, want) {
 		t.Errorf("Languages don't match -> want: %v - got: %v", want, got)

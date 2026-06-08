@@ -1,0 +1,13 @@
+export interface CreateItemDto {
+  name: string;
+  description?: string;
+}
+
+export interface ItemResponse {
+  id: string;
+  name: string;
+  description: string | null;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
