@@ -1,0 +1,21 @@
+FROM node:22-alpine AS deps
+WORKDIR /app
+COPY package.json pnpm-lock.yaml ./
+COPY apps/sample-ms/package.json ./apps/sample-ms/
+RUN corepack enable && pnpm install --frozen-lockfile
+
+FROM node:22-alpine AS build
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npx prisma generate --schema=apps/sample-ms/prisma/schema.prisma
+RUN npx nest build sample-ms
+
+FROM node:22-alpine AS prod
+WORKDIR /app
+COPY --from=build /app/dist/apps/sample-ms ./dist
+COPY --from=build /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=build /app/apps/sample-ms/prisma ./prisma
+RUN --mount=type=secret,id=DATABASE_URL npx prisma generate
+USER node
+CMD ["node", "dist/main"]

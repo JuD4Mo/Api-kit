@@ -1,0 +1,53 @@
+# {{.ProjectName}}
+
+NestJS microservices monorepo with layered architecture.
+
+## Stack
+
+- **Language:** TypeScript
+- **Framework:** NestJS
+- **Communication:** NATS
+- **ORM:** Prisma
+- **Database:** PostgreSQL
+
+## Structure
+
+```
+apps/
+  gateway/          # HTTP entry point — proxies requests via NATS
+    src/
+      items/        # Items module (controller → service → NATS)
+  sample-ms/        # Sample microservice — handles business logic
+    src/
+      items/        # Items module (message handler → service → Prisma)
+      common/       # Database, DTOs, exceptions
+      config/       # Environment validation
+      nats/         # NATS client module
+```
+
+## Quick Start
+
+```bash
+cp .env.example .env
+docker compose up -d
+cd apps/sample-ms && npx prisma db push
+```
+
+## Development
+
+```bash
+# Install dependencies
+pnpm install
+
+# Start NATS and PostgreSQL
+docker compose up -d nats postgres
+
+# Start services
+pnpm start:gateway
+pnpm start:sample-ms
+```
+
+## Endpoints
+
+- `POST /api/items` — Create an item (gateway → NATS → sample-ms)
+- `GET  /api/items/:id` — Get item by ID

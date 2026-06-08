@@ -1,0 +1,16 @@
+import * as Joi from 'joi';
+
+export const envSchema = Joi.object({
+  NATS_URL: Joi.string().default('nats://localhost:4222'),
+  DATABASE_URL: Joi.string().required(),
+});
+
+export function validateEnv() {
+  const { error, value } = envSchema.validate(process.env, {
+    allowUnknown: true,
+  });
+  if (error) {
+    throw new Error(`Environment validation error: ${error.message}`);
+  }
+  return value;
+}

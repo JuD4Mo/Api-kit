@@ -1,0 +1,20 @@
+import { Catch, RpcExceptionFilter as NestRpcFilter } from '@nestjs/common';
+import { Observable, throwError } from 'rxjs';
+import { RpcException } from '@nestjs/microservices';
+
+@Catch()
+export class RpcExceptionFilter implements NestRpcFilter<RpcException> {
+  catch(exception: any): Observable<any> {
+    if (exception?.code === 'P2002') {
+      return throwError(() => ({
+        status: 409,
+        message: 'unique constraint violation',
+      }));
+    }
+
+    return throwError(() => ({
+      status: exception?.status ?? 500,
+      message: exception?.message ?? 'internal server error',
+    }));
+  }
+}

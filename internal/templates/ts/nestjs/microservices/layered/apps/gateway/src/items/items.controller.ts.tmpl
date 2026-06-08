@@ -1,0 +1,32 @@
+import {
+  Controller,
+  Post,
+  Get,
+  Param,
+  Body,
+  Inject,
+  UseFilters,
+} from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { ItemsService } from './items.service';
+import { CreateItemDto } from './dto/create-item.dto';
+import { RpcExceptionFilter } from '../common/exceptions/rpc-exception.filter';
+
+@Controller('items')
+@UseFilters(RpcExceptionFilter)
+export class ItemsController {
+  constructor(
+    private readonly service: ItemsService,
+    @Inject('NATS_CLIENT') private readonly nats: ClientProxy,
+  ) {}
+
+  @Post()
+  create(@Body() dto: CreateItemDto) {
+    return this.service.create(dto, this.nats);
+  }
+
+  @Get(':id')
+  getById(@Param('id') id: string) {
+    return this.service.getById(id, this.nats);
+  }
+}
