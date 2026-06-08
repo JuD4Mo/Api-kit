@@ -18,7 +18,7 @@ var Labels = map[string]string{
 	"springboot":    " Spring Boot",
 	"gin":           " Gin",
 	"echo":          " Echo",
-	"express":       " Express",
+	"express":       " Express",
 	"monolith":      " Monolith",
 	"microservices": " Microservices",
 	"layered":       " Layered",
