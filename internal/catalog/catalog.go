@@ -18,6 +18,7 @@ var Labels = map[string]string{
 	"springboot":    " Spring Boot",
 	"gin":           " Gin",
 	"echo":          " Echo",
+	"express":       " Express",
 	"monolith":      " Monolith",
 	"microservices": " Microservices",
 	"layered":       " Layered",
@@ -41,9 +42,12 @@ const (
 	ProjectTypeMicroservices ProjectType  = "microservices"
 	LanguageTs               Language     = "ts"
 	FrameworkNestJS          Framework    = "nestjs"
+	FrameworkExpress         Framework    = "express"
 	LanguageRuby             Language     = "ruby"
 	FrameworkRails           Framework    = "rails"
-	Python                   Language     = "python"
+	LanguagePython           Language     = "python"
+	FrameworkDjango          Framework    = "django"
+	FrameworkEcho            Framework    = "echo"
 	FrameworkChi             Framework    = "chi"
 	FramewrokHttpNet         Framework    = "http/net"
 	ArchitectureHexagonal    Architecture = "hexagonal"
@@ -106,18 +110,54 @@ func NewCatalog() Catalog {
 				ProjectType:  ProjectTypeMonolith,
 				Architecture: ArchitectureLayered,
 			},
-		{
-			Language:     LanguageRuby,
-			Framework:    FrameworkRails,
-			ProjectType:  ProjectTypeMonolith,
-			Architecture: ArchitectureLayered,
-		},
-		{
-			Language:     LanguageTs,
-			Framework:    FrameworkNestJS,
-			ProjectType:  ProjectTypeMicroservices,
-			Architecture: ArchitectureLayered,
-		},
+			{
+				Language:     LanguageGo,
+				Framework:    FrameworkEcho,
+				ProjectType:  ProjectTypeMonolith,
+				Architecture: ArchitectureLayered,
+			},
+			{
+				Language:     LanguageGo,
+				Framework:    FrameworkEcho,
+				ProjectType:  ProjectTypeMonolith,
+				Architecture: ArchitectureHexagonal,
+			},
+			{
+				Language:     LanguageGo,
+				Framework:    FrameworkGin,
+				ProjectType:  ProjectTypeMonolith,
+				Architecture: ArchitectureHexagonal,
+			},
+			{
+				Language:     LanguageRuby,
+				Framework:    FrameworkRails,
+				ProjectType:  ProjectTypeMonolith,
+				Architecture: ArchitectureLayered,
+			},
+			{
+				Language:     LanguageTs,
+				Framework:    FrameworkNestJS,
+				ProjectType:  ProjectTypeMonolith,
+				Architecture: ArchitectureLayered,
+			},
+			{
+				Language:     LanguageTs,
+				Framework:    FrameworkNestJS,
+				ProjectType:  ProjectTypeMicroservices,
+				Architecture: ArchitectureLayered,
+			},
+			{
+				Language:     LanguageTs,
+				Framework:    FrameworkExpress,
+				ProjectType:  ProjectTypeMonolith,
+				Architecture: ArchitectureLayered,
+			},
+			{
+				Language:     LanguagePython,
+				Framework:    FrameworkDjango,
+				ProjectType:  ProjectTypeMonolith,
+				Architecture: ArchitectureLayered,
+			},
 		},
 	}
 }

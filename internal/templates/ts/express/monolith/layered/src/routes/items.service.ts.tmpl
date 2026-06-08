@@ -1,0 +1,33 @@
+import { Item } from '../models/item';
+import { ItemRepository } from '../models/index';
+import { v4 as uuid } from 'uuid';
+
+export class ItemService {
+  constructor(private readonly repo: ItemRepository) {}
+
+  async create(name: string, description?: string): Promise<Item> {
+    const item: Item = {
+      id: uuid(),
+      name,
+      description,
+      createdAt: new Date(),
+    };
+    return this.repo.create(item);
+  }
+
+  async findAll(): Promise<Item[]> {
+    return this.repo.findAll();
+  }
+
+  async findById(id: string): Promise<Item | null> {
+    return this.repo.findById(id);
+  }
+
+  async update(id: string, data: Partial<Pick<Item, 'name' | 'description'>>): Promise<Item | null> {
+    return this.repo.update(id, data);
+  }
+
+  async delete(id: string): Promise<boolean> {
+    return this.repo.delete(id);
+  }
+}

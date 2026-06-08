@@ -1,0 +1,23 @@
+# {{.ProjectName}}
+
+NestJS monolith with layered architecture.
+
+## Stack
+
+- **Language:** TypeScript
+- **Framework:** NestJS
+- **ORM:** Prisma
+- **Database:** SQLite (default)
+
+## Quick Start
+
+```bash
+npm install
+npx prisma db push
+npm run start:dev
+```
+
+## Endpoints
+
+- `POST /api/items` — Create an item
+- `GET  /api/items/:id` — Get item by ID

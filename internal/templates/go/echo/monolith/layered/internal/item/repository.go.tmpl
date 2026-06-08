@@ -1,0 +1,40 @@
+package item
+
+import (
+	"context"
+	"log"
+
+	"gorm.io/gorm"
+)
+
+type Repository interface {
+	Create(ctx context.Context, item *Item) error
+	GetByID(ctx context.Context, id string) (*Item, error)
+}
+
+type repo struct {
+	log *log.Logger
+	db  *gorm.DB
+}
+
+func NewRepo(log *log.Logger, db *gorm.DB) Repository {
+	return &repo{log: log, db: db}
+}
+
+func (r *repo) Create(ctx context.Context, item *Item) error {
+	if err := r.db.WithContext(ctx).Create(item).Error; err != nil {
+		r.log.Println(err)
+		return err
+	}
+	r.log.Println("item created with id: ", item.ID)
+	return nil
+}
+
+func (r *repo) GetByID(ctx context.Context, id string) (*Item, error) {
+	var item Item
+	result := r.db.WithContext(ctx).First(&item, "id = ?", id)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &item, nil
+}

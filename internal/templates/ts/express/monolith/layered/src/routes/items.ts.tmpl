@@ -1,0 +1,17 @@
+import { Router } from 'express';
+import { ItemController } from './items.controller';
+import { ItemService } from './items.service';
+import { InMemoryItemRepository } from './items.repository';
+
+const router = Router();
+const repository = new InMemoryItemRepository();
+const service = new ItemService(repository);
+const controller = new ItemController(service);
+
+router.post('/', controller.create);
+router.get('/', controller.findAll);
+router.get('/:id', controller.findById);
+router.put('/:id', controller.update);
+router.delete('/:id', controller.delete);
+
+export { router as itemsRouter };

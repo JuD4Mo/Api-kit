@@ -9,7 +9,7 @@ func TestLanguages(t *testing.T) {
 	c := NewCatalog()
 
 	got := c.Languages()
-	want := []Language{LanguageGo, LanguageJava, LanguageRuby, LanguageTs}
+	want := []Language{LanguageGo, LanguageJava, LanguageRuby, LanguageTs, LanguagePython}
 
 	if !slices.Equal(got, want) {
 		t.Errorf("Languages don't match -> want: %v - got: %v", want, got)
@@ -20,7 +20,7 @@ func TestFrameworksByLanguage(t *testing.T) {
 	c := NewCatalog()
 	lang := LanguageGo
 	got := c.FrameworksByLanguage(lang)
-	want := []Framework{FrameworkGin, FrameworkChi, FramewrokHttpNet}
+	want := []Framework{FrameworkGin, FrameworkChi, FramewrokHttpNet, FrameworkEcho}
 
 	if !slices.Equal(got, want) {
 		t.Errorf("Frameworks don't match -> want: %v - got: %v", want, got)
@@ -57,7 +57,7 @@ func TestArchitecturesByBase(t *testing.T) {
 	c := NewCatalog()
 
 	got := c.ArchitecturesByBase(LanguageGo, FrameworkGin, ProjectTypeMonolith)
-	want := []Architecture{ArchitectureLayered}
+	want := []Architecture{ArchitectureLayered, ArchitectureHexagonal}
 
 	if !slices.Equal(got, want) {
 		t.Errorf("Architecture types don't match -> want: %v - got: %v", want, got)
