@@ -1,0 +1,40 @@
+package main
+
+import (
+	"log"
+	"net/http"
+	"time"
+
+	"{{.Module}}/internal/item"
+	"{{.Module}}/internal/platform/database"
+	"github.com/gin-gonic/gin"
+)
+
+func main() {
+	db, err := database.NewDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	repo := item.NewRepository(db)
+	svc := item.NewService(repo)
+	ctrl := item.NewController(svc)
+
+	r := gin.Default()
+
+	r.POST("/items", ctrl.Create)
+	r.GET("/items/:id", ctrl.GetByID)
+
+	srv := &http.Server{
+		Handler:      r,
+		Addr:         ":8000",
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+
+	log.Println("server running on :8000")
+	if err := srv.ListenAndServe(); err != nil {
+		log.Fatal(err)
+	}
+}

@@ -1,0 +1,32 @@
+import { Item } from '../models/item';
+import { ItemRepository } from '../models/index';
+
+export class InMemoryItemRepository implements ItemRepository {
+  private items: Map<string, Item> = new Map();
+
+  async create(item: Item): Promise<Item> {
+    this.items.set(item.id, item);
+    return item;
+  }
+
+  async findAll(): Promise<Item[]> {
+    return Array.from(this.items.values());
+  }
+
+  async findById(id: string): Promise<Item | null> {
+    return this.items.get(id) ?? null;
+  }
+
+  async update(id: string, data: Partial<Pick<Item, 'name' | 'description'>>): Promise<Item | null> {
+    const item = this.items.get(id);
+    if (!item) return null;
+
+    const updated = { ...item, ...data };
+    this.items.set(id, updated);
+    return updated;
+  }
+
+  async delete(id: string): Promise<boolean> {
+    return this.items.delete(id);
+  }
+}

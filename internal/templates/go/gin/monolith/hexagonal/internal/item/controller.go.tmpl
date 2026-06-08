@@ -1,0 +1,57 @@
+package item
+
+import (
+	"errors"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+type Controller struct {
+	svc Service
+}
+
+func NewController(svc Service) *Controller {
+	return &Controller{svc: svc}
+}
+
+func (h *Controller) Create(c *gin.Context) {
+	var req struct {
+		Name        string `json:"name"`
+		Description string `json:"description"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		return
+	}
+
+	if req.Name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "name is required"})
+		return
+	}
+
+	item, err := h.svc.Create(c.Request.Context(), req.Name, req.Description)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, item)
+}
+
+func (h *Controller) GetByID(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
+
+	item, err := h.svc.GetByID(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "item not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, item)
+}

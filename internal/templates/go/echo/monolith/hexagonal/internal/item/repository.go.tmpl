@@ -1,0 +1,34 @@
+package item
+
+import (
+	"context"
+	"errors"
+
+	"gorm.io/gorm"
+)
+
+type repo struct {
+	db *gorm.DB
+}
+
+func NewRepository(db *gorm.DB) Repository {
+	return &repo{db: db}
+}
+
+func (r *repo) Create(ctx context.Context, item *Item) error {
+	return r.db.WithContext(ctx).Create(item).Error
+}
+
+func (r *repo) GetByID(ctx context.Context, id string) (*Item, error) {
+	var item Item
+
+	result := r.db.WithContext(ctx).First(&item, "id = ?", id)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, ErrNotFound
+		}
+		return nil, result.Error
+	}
+
+	return &item, nil
+}

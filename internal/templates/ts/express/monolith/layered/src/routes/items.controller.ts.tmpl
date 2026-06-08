@@ -1,0 +1,50 @@
+import { Request, Response } from 'express';
+import { ItemService } from './items.service';
+
+export class ItemController {
+  constructor(private readonly service: ItemService) {}
+
+  create = async (req: Request, res: Response) => {
+    const { name, description } = req.body;
+
+    if (!name || typeof name !== 'string') {
+      res.status(400).json({ error: 'name is required' });
+      return;
+    }
+
+    const item = await this.service.create(name, description);
+    res.status(201).json(item);
+  };
+
+  findAll = async (_req: Request, res: Response) => {
+    const items = await this.service.findAll();
+    res.json(items);
+  };
+
+  findById = async (req: Request, res: Response) => {
+    const item = await this.service.findById(req.params.id);
+    if (!item) {
+      res.status(404).json({ error: 'item not found' });
+      return;
+    }
+    res.json(item);
+  };
+
+  update = async (req: Request, res: Response) => {
+    const item = await this.service.update(req.params.id, req.body);
+    if (!item) {
+      res.status(404).json({ error: 'item not found' });
+      return;
+    }
+    res.json(item);
+  };
+
+  delete = async (req: Request, res: Response) => {
+    const ok = await this.service.delete(req.params.id);
+    if (!ok) {
+      res.status(404).json({ error: 'item not found' });
+      return;
+    }
+    res.status(204).send();
+  };
+}

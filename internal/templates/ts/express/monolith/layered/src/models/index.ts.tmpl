@@ -1,0 +1,9 @@
+import { Item } from '../models/item';
+
+export interface ItemRepository {
+  create(data: { name: string; description?: string }): Promise<Item>;
+  findAll(): Promise<Item[]>;
+  findById(id: string): Promise<Item | null>;
+  update(id: string, data: Partial<Pick<Item, 'name' | 'description'>>): Promise<Item | null>;
+  delete(id: string): Promise<boolean>;
+}
